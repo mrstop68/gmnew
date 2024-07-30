@@ -36,7 +36,7 @@ $dataHOTEL = json_decode($resultHOTEL);
 $dataPAGES = json_decode($resultPAGES);
 $dataCODES = json_decode($resultCODES);
 $dataLANG = json_decode($resultLANG);
-//  error_reporting(0);
+error_reporting(0);
    class FileOperation {
       public static function writeToFile($filename, $content) {
         if(file_exists($filename)) {

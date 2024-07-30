@@ -96,14 +96,8 @@
                 return false;
             }
         }
-        //tüm blog sayfalarından ve ilk 10 ini seçme blogPageFilter
+        //tüm blog sayfalarından ve gelen sayı parametresine göre sayfa sayısı seçme 
 
-        // function blogPageFilter($allPages){
-        //     $filteredPages = array_filter($allPages, function($page) {
-        //         return $page->pagetype == $this->parameterValue;
-        //     });
-        //     return array_slice($filteredPages, 0, 2);
-        // }
             function blogPageFilter($allPages){
                 return $allPages->pagetype == $this->parameterValue;
             }

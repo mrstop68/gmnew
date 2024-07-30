@@ -1,4 +1,5 @@
 <?php include 'code.php' ?>
+<!DOCTYPE html>
 
 <!DOCTYPE html>
 <html lang="tr">
@@ -29,7 +30,6 @@
     <link href="<?=$dataHOTEL->website?>/assets/css/variables.css" rel="stylesheet">
     <link href="<?=$dataHOTEL->website?>/assets/css/main.css" rel="stylesheet">
 
-
     <?php include 'inc/header.php' ?>
 
 
@@ -40,103 +40,105 @@
                 <div class="row">
                     <div class="col-md-9 post-content" data-aos="fade-up">
 
-
                         <div class="single-post">
-                            <div class="post-meta"><span class="date">Güncel</span> <span class="mx-1">&bullet;</span>
-                                <span>11 Temmuz
-                                    2024</span>
+                        <?php $bPagename=array_filter($activePage->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bPagename = array_values($bPagename);
+                                ?>
+                            <div class="post-meta"><span class="date"><?=$activePage->category?></span> <span class="mx-1">&bullet;</span>
+                                <span><?php $date=DateTime::createFromFormat('Y/m/d', $activePage->date); echo $date->format('d/m/Y')?></span>
                             </div>
-                            <h1 class="mb-2">En Çok Eleman İhtiyacı Turizm Sektöründe</h1>
-                            <p>İŞKUR tarafından hazırlanan Açık İş İstatistikleri Araştırması’nın 2024 yılı ikinci
-                                çeyrek sonuç raporu
-                                yayımlandı.
-                                Raporda, en fazla işçi talep eden sektörler ve en çok işçi aranan meslekler belirlendi.
-                            </p>
+                            <h1 class="mb-2"><?=$bPagename[0]->langpagename?></h1>
+                            <?php $bContent=array_filter($activePage->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                               $bContent=array_values($bContent);?>
+                                <?=($bContent[0]->contentListLang) ?>
 
-                            <p>Raporun bulgularına göre, açık iş oranının en yüksek olduğu sektörlerin başında
-                                “konaklama ve yiyecek
-                                hizmeti
-                                faaliyetlerinin yanı sıra imalat ve kültür, sanat, eğlence, ve spor sektörleri yer
-                                alıyor.</p>
-
-                            <p>Açık işin en fazla olduğu meslekler ise “makineci (dikiş)”, “konfeksiyon işçisi” ve
-                                “servis elemanı
-                                (garson)” olarak
-                                sıralandı. Bu meslekler, sektördeki iş gücü ihtiyacını karşılamada büyük öneme sahip.
-                            </p>
-
-                            <p>Özellikle ‘Konaklama ve Yiyecek Hizmeti Faaliyetleri’ sektöründe en fazla aranan
-                                meslekler arasında
-                                servis elemanı
-                                (garson), kat hizmetleri elemanı, mutfak görevlisi, servis komisi ve bulaşıkçı (stevard)
-                                öne çıkıyor. Bu
-                                durum, sektörün
-                                dinamik yapısını ve iş gücü talebini net bir şekilde ortaya koyuyor.</p>
-
-                            <p>İŞKUR’un hazırladığı bu rapor, iş arayanlar ve işverenler için önemli bir rehber
-                                niteliğinde. İş gücü
-                                piyasasının
-                                ihtiyaçlarını ve eğilimlerini anlamak, hem iş arayanların hem de işverenlerin stratejik
-                                planlamalarında
-                                kritik bir rol
-                                oynuyor.</p>
-
-                            <figure class="my-4">
-                                <img src="<?=$dataHOTEL->website?>/assets/img/1/TURIZMDE-KREDI-BORCLARI-ARTIYOR.png" alt="" class="img-fluid">
-                                <figcaption>Lorem ipsum dolor sit amet consectetur adipisicing elit. Explicabo, odit?
-                                </figcaption>
-                            </figure>
-
-                            <div class="comment d-flex mb-4">
-                                <div class="flex-shrink-0">
+                            <div class="comment d-flex mb-4 mt-4">
+                                <!-- <div class="flex-shrink-0">
                                     <div class="avatar avatar-sm rounded-circle">
                                         <img class="avatar-img" src="<?=$dataHOTEL->website?>/assets/img/person-1.jpg" alt="" class="img-fluid">
                                     </div>
-                                </div>
+                                </div> -->
                                 <div class="flex-grow-1 ms-2 ms-sm-3">
                                     <div class="comment-meta d-flex align-items-baseline">
-                                        <h6 class="me-2">Yazar Ad Soyad</h6>
+                                     <span>Yazar:&nbsp;</span><h6 class="me-3"><?=$activePage->author?></h6>
 
                                     </div>
-                                    <div class="comment-body">
+                                    <!-- <div class="comment-body">
                                         <a href="#">haber@gm-center.com</a>
-                                    </div>
+                                    </div> -->
                                 </div><!-- End Single Post Content -->
 
                             </div>
                         </div>
 
-
                         <div class="row">
+                        <?php $blogPreview=array_filter($dataPAGES, array(new FilterPagesToLangCode('blog'), 'blogPageFilter'));
+                            $blogPreview= array_filter($blogPreview,function($item) use ($activePage){
+                                return $item->order==((int)$activePage->order)-1;
+                            });
+                            $blogPreview = reset($blogPreview);
+                            if($blogPreview){
+                                $PreviewPageContent=array_filter($blogPreview->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog'));
+                                $PreviewPageContent = reset($PreviewPageContent);
+                                preg_match('/<img[^>]+src="([^">]+)"/', $PreviewPageContent->contentListLang, $matches);
+                                    if (!empty($matches[1])) {
+                                        $firstImageSrc = $matches[1];
+                                    } 
+                                $PreviewPageName=array_filter($blogPreview->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog'));
+                                $PreviewPageName = reset($PreviewPageName);
+                                $PreviewLink=array_filter($blogPreview->link, array(new FilterPagesToLangCode($langURL), 'langFindBlog'));
+                                $PreviewLink = reset($PreviewLink);
+                            }
+                        ?>
+
+                        <?php $blogNext=array_filter($dataPAGES, array(new FilterPagesToLangCode('blog'), 'blogPageFilter'));
+                            $blogNext= array_filter($blogNext,function($item) use ($activePage){
+                                return $item->order==((int)$activePage->order)+1;
+                            });
+                            $blogNext = reset($blogNext);
+                            if($blogNext){
+                                $nextPageContent=array_filter($blogNext->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog'));
+                                $nextPageContent = reset($nextPageContent);
+                                preg_match('/<img[^>]+src="([^">]+)"/', $nextPageContent->contentListLang, $matches);
+                                    if (!empty($matches[1])) {
+                                        $firstImageSrcNext = $matches[1];
+                                    } 
+                                $nextPageName=array_filter($blogNext->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog'));
+                                $nextPageName = reset($nextPageName);
+                                $nextLink=array_filter($blogNext->link, array(new FilterPagesToLangCode($langURL), 'langFindBlog'));
+                                $nextLink = reset($nextLink);
+                            }
+                        ?>
+                         <?php  if($blogPreview){ ?>
                             <div class="col-md-6 mt-4" data-aos="fade-up">
 
-                                <a href="#" class="d-flex align-items-center">
-                                    <img src="<?=$dataHOTEL->website?>/assets/img/1/granada.png" alt="" class="img-fluid mx-4" width="150">
+                                <a href="<?=$PreviewLink->langlink?>" class="d-flex align-items-center">
+                                    <img src="<?=$firstImageSrc?>" alt="<?=$seoData->imagetag?>" class="img-fluid mx-4" width="150">
                                     <div>
                                         <div class="post-meta d-block"><span class="date"><span
                                                     class="bi-arrow-left"></span> Önceki Haber</span></div>
-                                        <h5>Granada Deluxe Açılıyor</h5>
+                                        <h5><?=$PreviewPageName->langpagename?></h5>
                                     </div>
                                 </a>
                             </div>
-
+                            <?php } ?>
+                            <?php  if($blogNext){ ?>
                             <div class="col-md-6 mt-4" data-aos="fade-up">
 
-                                <a href="#" class="d-flex align-items-center">
-                                    <img src="<?=$dataHOTEL->website?>/assets/img/1/TURIZMDE-KREDI-BORCLARI-ARTIYOR.png" alt=""
+                                <a href="<?=$nextLink->langlink?>" class="d-flex align-items-center">
+                                    <img src="<?=$firstImageSrcNext?>" alt=""
                                         class="img-fluid mx-4" width="150">
                                     <div>
                                         <div class="post-meta d-block"><span class="date"><span
                                                     class="bi-arrow-right"></span> Sonraki Haber</span></div>
-                                        <h5>Turizmde Kredi Borçları Artıyor</h5>
+                                        <h5><?=$nextPageName->langpagename?></h5>
                                     </div>
                                 </a>
                             </div>
+                            <?php } ?>
                         </div>
 
-
                     </div>
-
 
                     <div class="col-md-3">
                         <!-- ======= Sidebar ======= -->
@@ -146,7 +148,7 @@
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link active" id="pills-popular-tab" data-bs-toggle="pill"
                                         data-bs-target="#pills-popular" type="button" role="tab"
-                                        aria-controls="pills-popular" aria-selected="true">Son Okunanlar</button>
+                                        aria-controls="pills-popular" aria-selected="true">En Çok Okunanlar</button>
                                 </li>
                                 <!-- <li class="nav-item" role="presentation">
                   <button class="nav-link" id="pills-trending-tab" data-bs-toggle="pill"

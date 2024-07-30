@@ -62,7 +62,7 @@
                 <div class="row">
                      <!-- Slider -->
                     <div class="col-12 col-lg-8">
-                    <?php $blogPages=array_filter($dataPAGES, array(new FilterPagesToLangCode('blog'), 'blogPageFilter')); 
+                    <?php $blogPages=array_filter($dataPAGES, array(new FilterPagesToLangCode('blog'), 'blogPageFilter'));
                         $blogPages= array_slice($blogPages, 0, 5);
                     ?>
                     
@@ -93,39 +93,6 @@
                                             </a>
                                         </div>
                                 <?php } ?>
-                                <!-- <div class="swiper-slide"><img
-                                        src="<?=$dataHOTEL->website?>/assets/img/1/ANTALYA-HAVALIMANINDA-6-AYDA-145-MILYON-YOLCU-TRAFIGI.png"
-                                        alt="">
-                                    <div class="banner-info">
-                                        <div class="text-spot">
-                                            <h2>Manşet Haber Başlığı</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide"><img src="<?=$dataHOTEL->website?>/assets/img/1/DHMI-DERNEKLERI.png" alt="">
-                                    <div class="banner-info">
-                                        <div class="text-spot">
-                                            <h2>Manşet Haber Başlığı</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide"><img
-                                        src="<?=$dataHOTEL->website?>/assets/img/1/EFES-DENEYIM-MUZESI-BASARISINI-EFES-ANTIK-KENTINDE-KUTLADI.png"
-                                        alt="">
-                                    <div class="banner-info">
-                                        <div class="text-spot">
-                                            <h2>Manşet Haber Başlığı</h2>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="swiper-slide"><img
-                                        src="<?=$dataHOTEL->website?>/assets/img/1/HULL-CITY-SUMMER-TOUR-2024-ICIN-TURKIYEYE-GELIYOR.png" alt="">
-                                    <div class="banner-info">
-                                        <div class="text-spot">
-                                            <h2>Manşet Haber Başlığı</h2>
-                                        </div>
-                                    </div>
-                                </div> -->
 
                             </div>
                             <div class="custom-swiper-button-next">
@@ -138,8 +105,6 @@
                             <div class="swiper-pagination bannerSlider"></div>
                         </div>
                     </div>
-
-
 
                     <div class="col-12 col-lg-4">
                         <!-- 2. Reklam alanı -->
@@ -155,8 +120,6 @@
                             <h2><a href="#">Granada Luxury Red Resort Açıldı</a></h2>
                         </div>
                     </div>
-
-
 
                     <!-- 3. reklam alanı -->
                     <div class="container" data-aos="fade-up">
@@ -176,53 +139,46 @@
                     </div>
         </section>
 
-
-
         <section id="posts" class="posts">
             <div class="container" data-aos="fade-up">
                 <div class="row g-5">
+                    <?php  $blogPages= array_slice($blogPages, 0, 2); ?>
+                   
                     <div class="col-lg-4">
+                    <?php foreach($blogPages as $blog){ ?>
+                        <?php 
+                            $bContent=array_filter($blog->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                            $bContent = reset($bContent);
+                            // echo($bContent[0]->contentListLang) ;
+                            preg_match('/<img[^>]+src="([^">]+)"/', $bContent->contentListLang, $matches);
+                            if (!empty($matches[1])) {
+                                $firstImageSrc = $matches[1];
+                            } 
+                            $bLink=array_filter($blog->link, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                            $bLink = reset($bLink);
+                            $bPagename=array_filter($blog->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                            $bPagename = reset($bPagename);
+                            $shortContent=strip_tags($bContent->contentListLang);
+                            $shortContent=mb_strimwidth($shortContent, 0, 100, "...", "UTF-8");
+                        ?>
                         <div class="post-entry-1 lg">
-                            <a href="#"><img src="<?=$dataHOTEL->website?>/assets/img/1/COSMOS-MOONLIGHTTAN-KABOTAJ-BAYRAMI-MESAJI.png" alt=""
+                            <a href="<?=$bLink->langlink?>"><img src="<?=$firstImageSrc?>" alt=""
                                     class="img-fluid"></a>
-                            <div class="post-meta"><span class="date">Turizm</span> <span class="mx-1">&bullet;</span>
-                                <span>9 Temmuz
-                                    2024</span>
+                            <div class="post-meta"><span class="date"><?=$blog->category?></span> <span class="mx-1">&bullet;</span>
+                                <span><?=$blog->date?></span>
                             </div>
-                            <h2><a href="#">Cosmos Moonlight Kabotaj Bayramı Mesajı</a></h2>
-                            <p class="mb-4 d-block text-limit-news-50">Lorem ipsum dolor sit, amet consectetur
-                                adipisicing elit. Vero
-                                temporibus
-                                repudiandae, inventore pariatur numquam cumque possimus exercitationem?</p>
+                            <h2><a href="<?=$bLink->langlink?>"><?=$bPagename->langpagename?></a></h2>
+                            <p class="mb-4 d-block"><?=$shortContent?></p>
+                            <!-- <p class="mb-4 d-block text-limit-news-50"><?=$shortContent?></p> -->
 
                             <div class="d-flex align-items-center author">
-                                <div class="photo"><img src="<?=$dataHOTEL->website?>/assets/img/person-1.jpg" alt="" class="img-fluid"></div>
+                                <!-- <div class="photo"><img src="<?=$dataHOTEL->website?>/assets/img/person-1.jpg" alt="" class="img-fluid"></div> -->
                                 <div class="name">
-                                    <h3 class="m-0 p-0">Yazar Ad Soyad</h3>
+                                    <h3 class="m-0 p-0"><?=$blog->author?></h3>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="post-entry-1 lg">
-                            <a href="#"><img src="<?=$dataHOTEL->website?>/assets/img/1/TURIZMDE-KREDI-BORCLARI-ARTIYOR.png" alt=""
-                                    class="img-fluid"></a>
-                            <div class="post-meta"><span class="date">Turizm</span> <span class="mx-1">&bullet;</span>
-                                <span>9 Temmuz
-                                    2024</span>
-                            </div>
-                            <h2><a href="#">Turizmde Kredi Borçları Artıyor!</a></h2>
-                            <p class="mb-4 d-block text-limit-news-50">Lorem ipsum dolor sit, amet consectetur
-                                adipisicing elit. Vero
-                                temporibus
-                                repudiandae, inventore pariatur numquam cumque possimus exercitationem?</p>
-
-                            <div class="d-flex align-items-center author">
-                                <div class="photo"><img src="<?=$dataHOTEL->website?>/assets/img/person-1.jpg" alt="" class="img-fluid"></div>
-                                <div class="name">
-                                    <h3 class="m-0 p-0">Yazar Ad Soyad</h3>
-                                </div>
-                            </div>
-                        </div>
+                        <?php } ?>
                         <!-- 4. Reklam Alanı -->
                         <?php $popupInfo=array_filter(($langFind[0]->popup), array(new FilterPagesToLangCode($today,'5'), 'popupSelect'));?>
                         <?php if(!empty($popupInfo)){ ?>
@@ -310,7 +266,7 @@
                             <div class="col-lg-4">
 
                                 <div class="trending">
-                                    <h3 class="color-red">Son Okunan Haberler</h3>
+                                    <h3 class="color-red">En Çok Okunan Haberler</h3>
                                     <ul class="trending-post">
                                         <li>
                                             <a href="#">
