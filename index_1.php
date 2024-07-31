@@ -63,31 +63,32 @@
                      <!-- Slider -->
                     <div class="col-12 col-lg-8">
                     <?php $blogPages=array_filter($dataPAGES, array(new FilterPagesToLangCode('blog'), 'blogPageFilter'));
-                        $blogPages= array_slice($blogPages, 0, 5);
+                        $blogPagesSlider= array_slice($blogPages, 0, 5);
                     ?>
                     
                         <div class="swiper bannerSlider" id="bannerSlider">
                             <div class="swiper-wrapper">
-                                <?php foreach($blogPages as $blog){ ?>
+                                <?php foreach($blogPagesSlider as $blog){ ?>
                                     <?php $bContent=array_filter($blog->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
-                                    $bContent = array_values($bContent);
-                                    // echo($bContent[0]->contentListLang) ;
-                                    preg_match('/<img[^>]+src="([^">]+)"/', $bContent[0]->contentListLang, $matches);
+                                    $bContent = reset($bContent);
+                                    //  print_r($bContent->contentListLang);
+                                    preg_match('/<img[^>]+src="([^">]+)"/', $bContent->contentListLang, $matches);
                                     if (!empty($matches[1])) {
                                         $firstImageSrc = $matches[1];
                                     } 
+                                    // echo($firstImageSrc.'<br>') ;
                                     ?>
                                         <div class="swiper-slide">
                                         <?php $bLink=array_filter($blog->link, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
-                                            $bLink = array_values($bLink);
+                                            $bLink = reset($bLink);
                                             ?>
-                                            <a href="<?=$bLink[0]->langlink?>"><img src="<?=$firstImageSrc?>" alt="<?=$seoData->imagetag?>">
+                                            <a href="<?=$bLink->langlink?>"><img src="<?=$firstImageSrc?>" alt="<?=$seoData->imagetag?>">
                                                 <div class="banner-info">
                                                     <div class="text-spot">
                                                     <?php $bPagename=array_filter($blog->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
-                                                    $bPagename = array_values($bPagename);
+                                                    $bPagename = reset($bPagename);
                                                     ?>
-                                                    <h2><?=$bPagename[0]->langpagename?></h2>
+                                                    <h2><?=$bPagename->langpagename?></h2>
                                                     </div>
                                                 </div>
                                             </a>
@@ -123,7 +124,7 @@
 
                     <!-- 3. reklam alanı -->
                     <div class="container" data-aos="fade-up">
-                    <?php $popupInfo=array_filter(($langFind[0]->popup), array(new FilterPagesToLangCode($today,'2'), 'popupSelect'));?>
+                    <?php $popupInfo=array_filter(($langFind[0]->popup), array(new FilterPagesToLangCode($today,'3'), 'popupSelect'));$popupInfo=array_values($popupInfo); ?>
                     <div class="row">
                             <?php if(!empty($popupInfo[count($popupInfo)-2])){ ?>
                             <div class="col-12 col-md-6">
@@ -142,10 +143,10 @@
         <section id="posts" class="posts">
             <div class="container" data-aos="fade-up">
                 <div class="row g-5">
-                    <?php  $blogPages= array_slice($blogPages, 0, 2); ?>
+                    <?php  $blogPagesFirst2= array_slice($blogPages, 0, 2); ?>
                    
                     <div class="col-lg-4">
-                    <?php foreach($blogPages as $blog){ ?>
+                    <?php foreach($blogPagesFirst2 as $blog){ ?>
                         <?php 
                             $bContent=array_filter($blog->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
                             $bContent = reset($bContent);
@@ -165,7 +166,7 @@
                             <a href="<?=$bLink->langlink?>"><img src="<?=$firstImageSrc?>" alt=""
                                     class="img-fluid"></a>
                             <div class="post-meta"><span class="date"><?=$blog->category?></span> <span class="mx-1">&bullet;</span>
-                                <span><?=$blog->date?></span>
+                                <span><?php $date=DateTime::createFromFormat('Y/m/d', $blog->date); echo $date->format('d/m/Y')?></span>
                             </div>
                             <h2><a href="<?=$bLink->langlink?>"><?=$bPagename->langpagename?></a></h2>
                             <p class="mb-4 d-block"><?=$shortContent?></p>
@@ -188,78 +189,83 @@
                     </div>
 
                     <div class="col-lg-8">
+                        <?php
+                            // Sayfalama parametreleri
+                            $blogP=$blogPages;
+                            $blogPagesOutFirst2=array_splice($blogP,0,2);
+                            $totalItems = count($blogP); // Toplam sayfa sayısı
+                            $itemsPerPage = 6; // Her sayfada gösterilecek sayfa sayısı
+                            $totalPages = ceil($totalItems / $itemsPerPage); // Toplam sayfa sayısı
+
+                            // Mevcut sayfa numarasını URL parametresinden al, yoksa varsayılan olarak 1 yap
+                            $currentPage = isset($_GET['p']) ? (int)$_GET['p'] : 1;
+
+                            // Geçerli sayfa numarasının geçerli bir değer olduğundan emin ol
+                            if ($currentPage < 1) {
+                                $currentPage = 1;
+                            } elseif ($currentPage > $totalPages) {
+                                $currentPage = $totalPages;
+                            }
+                            // Gösterilecek veriyi belirlemek için diziyi dilimle
+                            $offset = ($currentPage - 1) * $itemsPerPage;
+                            $currentItems = array_slice($blogP, $offset, $itemsPerPage);
+                            // echo($currentPage);
+                            $first3=array_slice($currentItems,0,3);
+                            $last3=array_slice($currentItems,3,3);
+
+                        ?>
                         <div class="row g-5">
                             <div class="col-lg-4 border-start custom-border">
+                                <?php foreach($first3 as $item){ 
+                                $bContent=array_filter($item->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bContent = reset($bContent);
+                                preg_match('/<img[^>]+src="([^">]+)"/', $bContent->contentListLang, $matches);
+                                if (!empty($matches[1])) {
+                                    $firstImageSrc = $matches[1];
+                                } 
+                                $bLink=array_filter($item->link, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bLink = reset($bLink);
+                                $bPagename=array_filter($item->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bPagename = reset($bPagename);
+                                //burası html etiketlerini temizleyerek metin kısmını veriyor. mb_strimwidth metni belirtilen karakter sayısı kadar filtreliyor
+                                $shortContent=strip_tags($bContent->contentListLang);
+                                $shortContent=mb_strimwidth($shortContent, 0, 70, "...", "UTF-8");    
+                                ?>
                                 <div class="post-entry-1">
-                                    <a href="#"><img src="<?=$dataHOTEL->website?>/assets/img/1/SEYAHAT-VERILERI-585x390.png" alt=""
+                                    <a href="<?=$bLink->langlink?>"><img src="<?=$firstImageSrc?>" alt=""
                                             class="img-fluid"></a>
-                                    <div class="post-meta"><span class="date">Turizm</span> <span
-                                            class="mx-1">&bullet;</span> <span>8
-                                            Temmuz 2024</span></div>
-                                    <h2><a href="#">Seyahat Verileri</a></h2>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio placeat
-                                        exercitationem magni
-                                        voluptates dolore.</p>
+                                    <div class="post-meta"><span class="date"><?=$item->category?></span> <span
+                                            class="mx-1">&bullet;</span> <span><?php $date=DateTime::createFromFormat('Y/m/d', $item->date); echo $date->format('d/m/Y')?></span></div>
+                                    <h2><a href="<?=$bLink->langlink?>"><?=$bPagename->langpagename?></a></h2>
+                                    <?=$shortContent?>
                                 </div>
-                                <div class="post-entry-1">
-                                    <a href="#"><img
-                                            src="<?=$dataHOTEL->website?>/assets/img/1/EFES-DENEYIM-MUZESI-BASARISINI-EFES-ANTIK-KENTINDE-KUTLADI-585x390.png"
-                                            alt="" class="img-fluid"></a>
-                                    <div class="post-meta"><span class="date">Aktüel</span> <span
-                                            class="mx-1">&bullet;</span> <span>8
-                                            Temmuz 2024</span></div>
-                                    <h2><a href="#">Efes Deneyim Müzesi Başarısını Efes Antik Kendinde Kutladı</a></h2>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio placeat
-                                        exercitationem magni
-                                        voluptates dolore.</p>
-                                </div>
-                                <div class="post-entry-1">
-                                    <a href="#"><img src="<?=$dataHOTEL->website?>/assets/img/1/ALKOL-ZAMLARI-DUDAK-UCUKLATIYOR.png" alt=""
-                                            class="img-fluid"></a>
-                                    <div class="post-meta"><span class="date">Aktüel</span> <span
-                                            class="mx-1">&bullet;</span> <span>11
-                                            Temmuz 2024</span></div>
-                                    <h2><a href="#">Alkol Zamları Dudak Uçuklatıyor</a></h2>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio placeat
-                                        exercitationem magni
-                                        voluptates dolore.</p>
-                                </div>
+                                <?php } ?>
                             </div>
                             <div class="col-lg-4 border-start custom-border">
+                            <?php foreach($last3 as $item){ 
+                                $bContent=array_filter($item->htmlcontent, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bContent = reset($bContent);
+                                preg_match('/<img[^>]+src="([^">]+)"/', $bContent->contentListLang, $matches);
+                                if (!empty($matches[1])) {
+                                    $firstImageSrc = $matches[1];
+                                } 
+                                $bLink=array_filter($item->link, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bLink = reset($bLink);
+                                $bPagename=array_filter($item->pagename, array(new FilterPagesToLangCode($langURL), 'langFindBlog')); 
+                                $bPagename = reset($bPagename);
+                                //burası html etiketlerini temizleyerek metin kısmını veriyor. mb_strimwidth metni belirtilen karakter sayısı kadar filtreliyor
+                                $shortContent=strip_tags($bContent->contentListLang);
+                                $shortContent=mb_strimwidth($shortContent, 0, 70, "...", "UTF-8");    
+                                ?>
                                 <div class="post-entry-1">
-                                    <a href="#"><img
-                                            src="<?=$dataHOTEL->website?>/assets/img/1/ANTALYA-HAVALIMANINDA-6-AYDA-145-MILYON-YOLCU-TRAFIGI-585x390.png"
-                                            alt="" class="img-fluid"></a>
-                                    <div class="post-meta"><span class="date">Güncel</span> <span
-                                            class="mx-1">&bullet;</span> <span>9
-                                            Temmuz 2024</span></div>
-                                    <h2><a href="#">Antalya Havalimanında Yolcu Trafiği</a></h2>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio placeat
-                                        exercitationem magni
-                                        voluptates dolore.</p>
-                                </div>
-                                <div class="post-entry-1">
-                                    <a href="#"><img src="<?=$dataHOTEL->website?>/assets/img/1/DHMI-DERNEKLERI-585x390.png" alt=""
+                                    <a href="<?=$bLink->langlink?>"><img src="<?=$firstImageSrc?>" alt=""
                                             class="img-fluid"></a>
-                                    <div class="post-meta"><span class="date">Güncel</span> <span
-                                            class="mx-1">&bullet;</span> <span>8
-                                            Temmuz 2024</span></div>
-                                    <h2><a href="#">DHMI Dernekleri Toplantısı</a></h2>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio placeat
-                                        exercitationem magni
-                                        voluptates dolore.</p>
+                                    <div class="post-meta"><span class="date"><?=$item->category?></span> <span
+                                            class="mx-1">&bullet;</span> <span><?php $date=DateTime::createFromFormat('Y/m/d', $item->date); echo $date->format('d/m/Y')?></span></div>
+                                    <h2><a href="<?=$bLink->langlink?>"><?=$bPagename->langpagename?></a></h2>
+                                    <?=$shortContent?>
                                 </div>
-                                <div class="post-entry-1">
-                                    <a href="#"><img src="<?=$dataHOTEL->website?>/assets/img/1/AHMET-METIN-GENC-1-585x390.png" alt=""
-                                            class="img-fluid"></a>
-                                    <div class="post-meta"><span class="date">Güncel</span> <span
-                                            class="mx-1">&bullet;</span> <span>10
-                                            Temmuz 2024</span></div>
-                                    <h2><a href="#">Trabzon Sağlık Turizminin Gözdesi Olacak</a></h2>
-                                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Distinctio placeat
-                                        exercitationem magni
-                                        voluptates dolore.</p>
-                                </div>
+                                <?php } ?>
                             </div>
 
 
@@ -326,13 +332,53 @@
                 </div>
                 <div class="text-center border-top border-bottom my-4">
                     <div class="custom-pagination">
+                    <?php   
+                    // for ($p = 1; $p <= $totalPages; $p++) {
+                    //     if ($p == $currentPage) {
+                    //         echo "<a class='active'>$p</a> "; // Mevcut sayfa
+                    //     } else {
+                    //         echo "<a href=\"?p=$p\">$p</a> ";
+                    //     }
+                    // }
+                    // Sayfalama linklerini oluştur
+                    $visiblePages = 7; // Görünecek sayfa sayısı (aktif sayfanın 3 öncesi ve 3 sonrası)
+                    $startPage = max(1, $currentPage - 3);
+                    $endPage = min($totalPages, $currentPage + 3);
 
-                        <a href="#" class="active">1</a>
+                    echo '<div style="margin-top: 20px;">';
+
+                    if ($startPage > 1) {
+                        echo "<a href=\"?p=1\">İlk</a> ... ";
+                    }
+                    // "Önceki"  butonları ok işaretleri ile
+                    if ($currentPage > 1) {
+                        echo "<a href=\"?p=" . ($currentPage - 1) . "\">&#8592; </a> ";
+                    }
+                    for ($p = $startPage; $p <= $endPage; $p++) {
+                        if ($p == $currentPage) {
+                            echo "<a class='active'>$p</a> "; // Mevcut sayfa
+                        } else {
+                            echo "<a href=\"?p=$p\">$p</a> ";
+                        }
+                    }
+
+                    if ($endPage < $totalPages) {
+                        echo "... <a href=\"?p=$totalPages\">Son</a>";
+                    }
+                    //  "Sonraki" butonları ok işaretleri ile
+
+                    if ($currentPage < $totalPages) {
+                        echo "<a href=\"?p=" . ($currentPage + 1) . "\"> &#8594;</a>";
+                    }
+
+                    echo '</div>';
+                    ?>
+                        <!-- <a href="<?='?p='.$p?>" class="active"><?=$p?></a>
                         <a href="#">2</a>
                         <a href="#">3</a>
                         <a href="#">4</a>
                         <a href="#">5</a>
-                        <a href="#" class="next"><span class="bi-arrow-right"></span></a>
+                        <a href="#" class="next"><span class="bi-arrow-right"></span></a> -->
                     </div>
                 </div>
             </div>
